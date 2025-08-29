@@ -80,5 +80,11 @@ void main() {
       expect(calculator.add('//[;][|]\n1;2|3'), equals(6));
       expect(calculator.add('//[a][b][c]\n1a2b3c4'), equals(10));
     });
+
+    test('should support multiple delimiters with length longer than one char', () {
+      expect(calculator.add('//[**][%%]\n1**2%%3'), equals(6));
+      expect(calculator.add('//[abc][def]\n1abc2def3'), equals(6));
+      expect(calculator.add('//[***][|||][+++]\n1***2|||3+++4'), equals(10));
+    });
   });
 }
