@@ -1,5 +1,6 @@
 class StringCalculator {
   int _callCount = 0;
+  static const int _maxAllowedNumber = 1000;
   
   int getCalledCount() {
     return _callCount;
@@ -7,62 +8,100 @@ class StringCalculator {
   
   int add(String numbers) {
     _callCount++;
+    
     if (numbers.isEmpty) {
       return 0;
     }
     
-    List<String> delimiters = [','];
-    String numbersToProcess = numbers;
+    final delimitersAndNumbers = _parseDelimitersAndNumbers(numbers);
+    final normalizedNumbers = _normalizeDelimiters(
+      delimitersAndNumbers.numbers, 
+      delimitersAndNumbers.delimiters
+    );
+    final numberList = _splitIntoNumbers(normalizedNumbers);
     
-    // Check for custom delimiter(s)
-    if (numbers.startsWith('//')) {
-      int delimiterEndIndex = numbers.indexOf('\n');
-      String delimiterSection = numbers.substring(2, delimiterEndIndex);
-      
-      // Parse multiple delimiters in brackets format //[delim1][delim2]
-      if (delimiterSection.contains('[')) {
-        delimiters = [];
-        RegExp regExp = RegExp(r'\[([^\]]+)\]');
-        Iterable<RegExpMatch> matches = regExp.allMatches(delimiterSection);
-        for (RegExpMatch match in matches) {
-          delimiters.add(match.group(1)!);
-        }
-      } else {
-        delimiters = [delimiterSection];
-      }
-      
-      numbersToProcess = numbers.substring(delimiterEndIndex + 1);
+    return _calculateSum(numberList);
+  }
+  
+  DelimitersAndNumbers _parseDelimitersAndNumbers(String input) {
+    if (!input.startsWith('//')) {
+      return DelimitersAndNumbers([','], input);
     }
     
-    // Replace newlines with commas, then replace all custom delimiters with commas
-    String normalizedNumbers = numbersToProcess.replaceAll('\n', ',');
-    for (String delimiter in delimiters) {
+    final delimiterEndIndex = input.indexOf('\n');
+    final delimiterSection = input.substring(2, delimiterEndIndex);
+    final numbersToProcess = input.substring(delimiterEndIndex + 1);
+    
+    final delimiters = _extractDelimiters(delimiterSection);
+    return DelimitersAndNumbers(delimiters, numbersToProcess);
+  }
+  
+  List<String> _extractDelimiters(String delimiterSection) {
+    if (!delimiterSection.contains('[')) {
+      return [delimiterSection];
+    }
+    
+    final delimiters = <String>[];
+    final regExp = RegExp(r'\[([^\]]+)\]');
+    final matches = regExp.allMatches(delimiterSection);
+    
+    for (final match in matches) {
+      delimiters.add(match.group(1)!);
+    }
+    
+    return delimiters;
+  }
+  
+  String _normalizeDelimiters(String numbers, List<String> delimiters) {
+    var normalizedNumbers = numbers.replaceAll('\n', ',');
+    
+    for (final delimiter in delimiters) {
       if (delimiter != ',') {
         normalizedNumbers = normalizedNumbers.replaceAll(delimiter, ',');
       }
     }
     
-    List<String> numberList = normalizedNumbers.split(',');
-    List<int> negativeNumbers = [];
-    int sum = 0;
+    return normalizedNumbers;
+  }
+  
+  List<String> _splitIntoNumbers(String normalizedNumbers) {
+    return normalizedNumbers
+        .split(',')
+        .where((number) => number.isNotEmpty)
+        .map((number) => number.trim())
+        .toList();
+  }
+  
+  int _calculateSum(List<String> numberStrings) {
+    final negativeNumbers = <int>[];
+    var sum = 0;
     
-    for (String number in numberList) {
-      if (number.isNotEmpty) {
-        int parsedNumber = int.parse(number.trim());
-        if (parsedNumber < 0) {
-          negativeNumbers.add(parsedNumber);
-        } else if (parsedNumber <= 1000) {
-          sum += parsedNumber;
-        }
-        // Numbers > 1000 are ignored
+    for (final numberString in numberStrings) {
+      final number = int.parse(numberString);
+      
+      if (number < 0) {
+        negativeNumbers.add(number);
+      } else if (number <= _maxAllowedNumber) {
+        sum += number;
       }
+      // Numbers > _maxAllowedNumber are ignored
     }
     
-    if (negativeNumbers.isNotEmpty) {
-      String negativeNumbersStr = negativeNumbers.join(',');
-      throw Exception('negative numbers not allowed $negativeNumbersStr');
-    }
-    
+    _validateNoNegativeNumbers(negativeNumbers);
     return sum;
   }
+  
+  void _validateNoNegativeNumbers(List<int> negativeNumbers) {
+    if (negativeNumbers.isNotEmpty) {
+      final negativeNumbersStr = negativeNumbers.join(',');
+      throw Exception('negative numbers not allowed $negativeNumbersStr');
+    }
+  }
+}
+
+class DelimitersAndNumbers {
+  final List<String> delimiters;
+  final String numbers;
+  
+  DelimitersAndNumbers(this.delimiters, this.numbers);
 }
