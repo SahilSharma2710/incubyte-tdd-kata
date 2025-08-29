@@ -12,5 +12,9 @@ void main() {
     test('should return 0 for empty string', () {
       expect(calculator.add(''), equals(0));
     });
+
+    test('should return the number itself for single number', () {
+      expect(calculator.add('1'), equals(1));
+    });
   });
 }
