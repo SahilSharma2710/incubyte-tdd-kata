@@ -74,5 +74,11 @@ void main() {
       expect(calculator.add('//[abc]\n1abc2abc3'), equals(6));
       expect(calculator.add('//[||]\n1||2||3'), equals(6));
     });
+
+    test('should support multiple delimiters', () {
+      expect(calculator.add('//[*][%]\n1*2%3'), equals(6));
+      expect(calculator.add('//[;][|]\n1;2|3'), equals(6));
+      expect(calculator.add('//[a][b][c]\n1a2b3c4'), equals(10));
+    });
   });
 }

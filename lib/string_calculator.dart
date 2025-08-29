@@ -11,28 +11,35 @@ class StringCalculator {
       return 0;
     }
     
-    String delimiter = ',';
+    List<String> delimiters = [','];
     String numbersToProcess = numbers;
     
-    // Check for custom delimiter
+    // Check for custom delimiter(s)
     if (numbers.startsWith('//')) {
       int delimiterEndIndex = numbers.indexOf('\n');
       String delimiterSection = numbers.substring(2, delimiterEndIndex);
       
-      // Check if delimiter is in brackets format //[delimiter]
-      if (delimiterSection.startsWith('[') && delimiterSection.endsWith(']')) {
-        delimiter = delimiterSection.substring(1, delimiterSection.length - 1);
+      // Parse multiple delimiters in brackets format //[delim1][delim2]
+      if (delimiterSection.contains('[')) {
+        delimiters = [];
+        RegExp regExp = RegExp(r'\[([^\]]+)\]');
+        Iterable<RegExpMatch> matches = regExp.allMatches(delimiterSection);
+        for (RegExpMatch match in matches) {
+          delimiters.add(match.group(1)!);
+        }
       } else {
-        delimiter = delimiterSection;
+        delimiters = [delimiterSection];
       }
       
       numbersToProcess = numbers.substring(delimiterEndIndex + 1);
     }
     
-    // Replace newlines with commas, then replace custom delimiter with commas
+    // Replace newlines with commas, then replace all custom delimiters with commas
     String normalizedNumbers = numbersToProcess.replaceAll('\n', ',');
-    if (delimiter != ',') {
-      normalizedNumbers = normalizedNumbers.replaceAll(delimiter, ',');
+    for (String delimiter in delimiters) {
+      if (delimiter != ',') {
+        normalizedNumbers = normalizedNumbers.replaceAll(delimiter, ',');
+      }
     }
     
     List<String> numberList = normalizedNumbers.split(',');
