@@ -1,5 +1,12 @@
 class StringCalculator {
+  int _callCount = 0;
+  
+  int getCalledCount() {
+    return _callCount;
+  }
+  
   int add(String numbers) {
+    _callCount++;
     if (numbers.isEmpty) {
       return 0;
     }

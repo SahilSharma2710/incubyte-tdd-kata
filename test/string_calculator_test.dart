@@ -48,5 +48,19 @@ void main() {
       expect(() => calculator.add('-1,-2,3,-4'), 
         throwsA(predicate((e) => e.toString().contains('negative numbers not allowed -1,-2,-4'))));
     });
+
+    test('should track how many times add was called', () {
+      StringCalculator freshCalculator = StringCalculator();
+      expect(freshCalculator.getCalledCount(), equals(0));
+      
+      freshCalculator.add('1');
+      expect(freshCalculator.getCalledCount(), equals(1));
+      
+      freshCalculator.add('1,2');
+      expect(freshCalculator.getCalledCount(), equals(2));
+      
+      freshCalculator.add('//;\n1;2');
+      expect(freshCalculator.getCalledCount(), equals(3));
+    });
   });
 }
