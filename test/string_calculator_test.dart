@@ -68,5 +68,11 @@ void main() {
       expect(calculator.add('1000,1001,2'), equals(1002));
       expect(calculator.add('1,2000,3'), equals(4));
     });
+
+    test('should support delimiters of any length', () {
+      expect(calculator.add('//[***]\n1***2***3'), equals(6));
+      expect(calculator.add('//[abc]\n1abc2abc3'), equals(6));
+      expect(calculator.add('//[||]\n1||2||3'), equals(6));
+    });
   });
 }

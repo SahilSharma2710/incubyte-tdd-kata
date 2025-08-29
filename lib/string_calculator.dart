@@ -17,7 +17,15 @@ class StringCalculator {
     // Check for custom delimiter
     if (numbers.startsWith('//')) {
       int delimiterEndIndex = numbers.indexOf('\n');
-      delimiter = numbers.substring(2, delimiterEndIndex);
+      String delimiterSection = numbers.substring(2, delimiterEndIndex);
+      
+      // Check if delimiter is in brackets format //[delimiter]
+      if (delimiterSection.startsWith('[') && delimiterSection.endsWith(']')) {
+        delimiter = delimiterSection.substring(1, delimiterSection.length - 1);
+      } else {
+        delimiter = delimiterSection;
+      }
+      
       numbersToProcess = numbers.substring(delimiterEndIndex + 1);
     }
     
