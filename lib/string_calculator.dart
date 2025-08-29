@@ -36,9 +36,10 @@ class StringCalculator {
         int parsedNumber = int.parse(number.trim());
         if (parsedNumber < 0) {
           negativeNumbers.add(parsedNumber);
-        } else {
+        } else if (parsedNumber <= 1000) {
           sum += parsedNumber;
         }
+        // Numbers > 1000 are ignored
       }
     }
     
