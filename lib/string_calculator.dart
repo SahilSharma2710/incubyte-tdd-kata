@@ -21,12 +21,25 @@ class StringCalculator {
     }
     
     List<String> numberList = normalizedNumbers.split(',');
+    List<int> negativeNumbers = [];
     int sum = 0;
+    
     for (String number in numberList) {
       if (number.isNotEmpty) {
-        sum += int.parse(number.trim());
+        int parsedNumber = int.parse(number.trim());
+        if (parsedNumber < 0) {
+          negativeNumbers.add(parsedNumber);
+        } else {
+          sum += parsedNumber;
+        }
       }
     }
+    
+    if (negativeNumbers.isNotEmpty) {
+      String negativeNumbersStr = negativeNumbers.join(',');
+      throw Exception('negative numbers not allowed $negativeNumbersStr');
+    }
+    
     return sum;
   }
 }

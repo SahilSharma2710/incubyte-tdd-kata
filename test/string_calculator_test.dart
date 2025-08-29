@@ -35,5 +35,18 @@ void main() {
       expect(calculator.add('//;\n1;2'), equals(3));
       expect(calculator.add('//*\n1*2*3'), equals(6));
     });
+
+    test('should throw exception for negative numbers', () {
+      expect(() => calculator.add('-1'), 
+        throwsA(predicate((e) => e.toString().contains('negative numbers not allowed -1'))));
+      
+      expect(() => calculator.add('1,-2,3'), 
+        throwsA(predicate((e) => e.toString().contains('negative numbers not allowed -2'))));
+    });
+
+    test('should show all negative numbers in exception message', () {
+      expect(() => calculator.add('-1,-2,3,-4'), 
+        throwsA(predicate((e) => e.toString().contains('negative numbers not allowed -1,-2,-4'))));
+    });
   });
 }
